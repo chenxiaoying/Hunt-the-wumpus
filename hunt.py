@@ -81,7 +81,6 @@ class Layout(QtGui.QWidget):
 		self.pit()
 		self.bats()
 			
-
 		
 	def arro(self):
 		#draw arrow
@@ -147,28 +146,33 @@ class Layout(QtGui.QWidget):
 	def gold(self):    
 		#Pick gold
 		for i in range(3):
-			if self.posPlayer  == (randrange(0,300,60),randrange(0,300,60)):
+			self.posGold = (randrange(0,300,60),randrange(0,300,60))
+			if self.posPlayer  == self.posGold:
 				self.posGold = self.posPlayer
 				self.score = self.score + 50
 				self.opm1.insertPlainText('\nYou can detect a glimmer') 
+				return self.posGold
 		return self.score
 		
 	def pit(self):
-		for i in range(3):
-			if self.posPlayer  == (randrange(0,300,60),randrange(0,300,60)):
+		for i in range(2):
+			self.posPit = (randrange(0,300,60),randrange(0,300,60))
+			if self.posPlayer  == self.posPit:
 				if self.posPlayer  != self.posGold:
 					self.posPit = self.posPlayer
 					self.opm1.insertPlainText('\nYou feel the draft from the pit') 
 					self.gameOver()
+		return self.posPit
 				
 	def bats(self):
-		for i in range(3):
-			if self.posPlayer  == (randrange(0,300,60),randrange(0,300,60)):
-				if self.posPlayer != self.posGold or self.posPlayer != self.posPit:
-					self.posbats = self.posPlayer
-					self.opm1.insertPlainText('\nYou feel the draft from the pit') 
-					self.gameOver()
-		
+		for i in range(6):
+			self.posBats = (randrange(0,300,60),randrange(0,300,60))
+			if self.posPlayer  == self.posBats:
+				if self.posPlayer != self.posGold and self.posPlayer != self.posPit:
+					self.posBats = self.posPlayer
+					self.opm1.insertPlainText('\nYou hear the flapping of wings')
+					self.posPlayer =(randrange(0,300,60),randrange(0,300,60))
+					self.player.move(self.posPlayer[0],self.posPlayer[1])
 		
 	def scr(self):
 		score = self.score
