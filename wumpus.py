@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from PyQt4 import QtCore, QtGui
 import sys
 from random import randrange
@@ -14,7 +16,7 @@ class Layout(QtGui.QWidget):
 	
 	def initUI(self):
 		#interface window
-		self.setGeometry(200, 200, 800, 600)
+		self.setGeometry(200, 200, 800, 550)
 		self.setWindowTitle('hunt the wumpus')
 		
 	def paintEvent(self, e):
@@ -31,7 +33,7 @@ class Layout(QtGui.QWidget):
 			color.setNamedColor('#d4d4d4')
 			qp.setPen(color)
 			qp.setBrush(QtGui.QColor(120, 120, 220))
-			qp.drawRect(i[0],i[1],80,80)
+			qp.drawRect(i[0],i[1],60,60)
 		
 	def player(self):
 		#draw player
@@ -72,23 +74,30 @@ class Layout(QtGui.QWidget):
 			if x > 0:
 				self.posPlayer = (x-60,y)
 		self.player.move(self.posPlayer[0],self.posPlayer[1])
-		self.death()
-		   
+		self.death()  
 		if self.posPlayer[1] == self.posWumpus[1] or self.posPlayer[0] == self.posWumpus[0]:
-			self.opm1.insertPlainText('You can smell the foul stench of the Wumpus\n')   
+			self.opm1.insertPlainText('You can smell the foul stench of the Wumpus\n')    
 		self.gold()
+		if self.posPlayer[1] == self.posGold[1] or self.posPlayer[0] == self.posGold[0]:
+			self.opm1.insertPlainText('You can detect a glimmer\n')
 		self.scr()
 		self.pit()
+		if self.posPlayer[1] == self.posPit[1] or self.posPlayer[0] == self.posPit[0]:
+			self.opm1.insertPlainText('You feel the draft from the pit\n')
 		self.bats()
+		if self.posPlayer[1] == self.posBats[1] or self.posPlayer[0] == self.posBats[0]:
+			self.opm1.insertPlainText('You hear the flapping of wings\n')
+		self.opm1.textChanged.connect(self.opmUp)
 			
-		
+			
 	def arro(self):
 		#draw arrow
 		self.arrow = QtGui.QLabel(self)
 		self.arrow.setText('arrow')
 		self.arrow.move(self.posPlayer[0],self.posPlayer[1])
+		self.arrowTimes = 0
 		
-		#richting arrow        
+		#richting arrow       
 		self.btnArrowUp = QtGui.QPushButton('Arrow up', self)
 		self.btnArrowUp.move(500, 100)
 		self.btnArrowUp.clicked.connect(self.posArrow)
@@ -104,20 +113,25 @@ class Layout(QtGui.QWidget):
 		
 	def posArrow(self):
 		# event arrow
+		self.arrowTimes = self.arrowTimes + 1
 		x,y = self.posPlayer
 		sender = self.sender()
-		if sender == self.btnArrowUp:
-			self.posArr = (x,y-60)
-		elif sender == self.btnArrowDown:
-			self.posArr = (x,y+60)
-		elif sender == self.btnArrowRight:
-			self.posArr = (x+60,y)
+		if self.arrowTimes <= 5:
+			if sender == self.btnArrowUp:
+				self.posArr = (x,y-60)
+			elif sender == self.btnArrowDown:
+				self.posArr = (x,y+60)
+			elif sender == self.btnArrowRight:
+				self.posArr = (x+60,y)
+			else:
+				self.posArr = (x-60,y)
+			self.arrow.move(self.posArr[0],self.posArr[1])
+			if self.posArr != self.posWumpus:
+				self.opm1.insertPlainText('You missed it\n')
+			self.victory()
+			self.scr()
 		else:
-			self.posArr = (x-60,y)
-		self.arrow.move(self.posArr[0],self.posArr[1])
-		self.victory()
-		if self.posArr != self.posWumpus:
-			self.opm1.insertPlainText('You missed it\n')
+			self.opm1.insertPlainText('You have no arrow more\n')
 		return self.posArr
 		
 		
@@ -127,10 +141,19 @@ class Layout(QtGui.QWidget):
 		x,y = randrange(0,300,60),randrange(0,240,60)
 		self.posWumpus = (x,y)
 		self.wump.move(self.posWumpus[0],self.posWumpus[1])
-		if self.posWumpus == self.posPlayer:
-			x,y = randrange(0,300,60),randrange(0,240,60)
-			self.posWumpus = (x,y)
-			self.wump.move(self.posWumpus[0],self.posWumpus[1])
+		for i in range(5):
+			if self.posWumpus == self.posPlayer:
+				x,y = randrange(0,300,60),randrange(0,240,60)
+				self.posWumpus = (x,y)
+				self.wump.move(self.posWumpus[0],self.posWumpus[1])
+			if x+60 == self.posPlayer[0] or x-60 == self.posPlayer[0]:
+				x,y = randrange(0,300,60),randrange(0,240,60)
+				self.posWumpus = (x,y)
+				self.wump.move(self.posWumpus[0],self.posWumpus[1])
+			if y+60 == self.posPlayer[1] or y-60 == self.posPlayer[1]:
+				x,y = randrange(0,300,60),randrange(0,240,60)
+				self.posWumpus = (x,y)
+				self.wump.move(self.posWumpus[0],self.posWumpus[1])
 		
 	def death(self):
 		if self.posPlayer == self.posWumpus:
@@ -138,41 +161,50 @@ class Layout(QtGui.QWidget):
 			self.gameOver()
 		  
 	def __str__(self):
-		if self.death:
-			return 'you lose'
-		if self.victory:
-			return 'you win'
+		return 'You lose! \nStart new game?'
+			
 		
 	def gold(self):    
 		#Pick gold
-		for i in range(3):
-			self.posGold = (randrange(0,300,60),randrange(0,300,60))
-			if self.posPlayer  == self.posGold:
-				self.posGold = self.posPlayer
-				self.score = self.score + 50
-				self.opm1.insertPlainText('You can detect a glimmer\n') 
-				return self.posGold
+		self.posGold = (randrange(0,300,60),randrange(0,240,60))
+		if self.posPlayer  == self.posGold:
+			self.posGold = self.posPlayer
+			self.score = self.score + 50
+			self.opm1.insertPlainText('You found gold\n') 
+			return self.posGold
 		return self.score
 		
 	def pit(self):
-		for i in range(2):
-			self.posPit = (randrange(0,300,60),randrange(0,300,60))
+		for i in range(3):
+			x,y = randrange(0,300,60),randrange(0,240,60)
+			self.posPit = (x,y)
+			for i in range(2):
+				if self.posPit == self.posPlayer:
+					x,y = randrange(0,300,60),randrange(0,240,60)
+					self.posPit = (x,y)
+				if x+60 == self.posPlayer[0] or x-60 == self.posPlayer[0]:
+					x,y = randrange(0,300,60),randrange(0,240,60)
+					self.posPit = (x,y)
+				if y+60 == self.posPlayer[1] or y-60 == self.posPlayer[1]:
+					x,y = randrange(0,300,60),randrange(0,240,60)
+					self.posPit = (x,y)
 			if self.posPlayer  == self.posPit:
-				if self.posPlayer  != self.posGold:
+				if self.posPlayer  != self.posGold or self.posWumpus != self.posPlayer:
 					self.posPit = self.posPlayer
-					self.opm1.insertPlainText('You feel the draft from the pit\n') 
+					self.opm1.insertPlainText('You fell down a pit\n') 
 					self.gameOver()
 		return self.posPit
 				
 	def bats(self):
-		for i in range(4):
-			self.posBats = (randrange(0,300,60),randrange(0,300,60))
+		for i in range(2):
+			x,y = randrange(0,300,60),randrange(0,240,60)
+			self.posBats = (x,y)
 			if self.posPlayer  == self.posBats:
-				if self.posPlayer != self.posGold and self.posPlayer != self.posPit:
+				if self.posPlayer != self.posGold or self.posPlayer != self.posPit or self.posPlayer != self.posWumpus:
 					self.posBats = self.posPlayer
-					self.opm1.insertPlainText('You hear the flapping of wings\n')
-					self.posPlayer =(randrange(0,300,60),randrange(0,300,60))
-					self.player.move(self.posPlayer[0],self.posPlayer[1])
+					self.opm1.insertPlainText('Bats carried you away\n')
+					self.posPlayer =(randrange(0,300,60),randrange(0,240,60))
+					self.player.move(self.posPlayer[0],self.posPlayer[1]) 
 					
 		
 	def scr(self):
@@ -182,24 +214,43 @@ class Layout(QtGui.QWidget):
 	def victory(self):
 		if self.posArr == self.posWumpus:
 			self.score = self.score + 500
-			self.gameOver()
+			msgBox = QtGui.QMessageBox()
+			msgBox.setText('You win! \nStart new game?')
+			msgBox.setWindowTitle('Game Over')
+			msgBox.setGeometry(400, 350, 500, 350)
+			msgBox.setStandardButtons(QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+			ans = msgBox.exec_()
+			if ans == QtGui.QMessageBox.Yes:
+				self.restart()
+			else:
+				self.show()
 			
 	def opmerkingbalk(self):        
 		self.opm1 = QtGui.QTextBrowser(self)
-		#self.opm1.setReadOnly(True)
 		self.opm1.move(450,250)      
 		self.sco = QtGui.QLabel(self)
 		self.sco.move(500,200)
 		self.sco.resize(100,20) 
 		self.score = 0
-			
+	
+	def opmUp(self):
+		self.opm1.moveCursor(QtGui.QTextCursor.End)
+		
 	def gameOver(self):
-		game = QtGui.QMessageBox.question(self,'Game Over','{} \n Your score is {} \n Start new game?'.format(self.__str__, self.scr),QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-		if game == QtGui.QMessageBox.Yes:
-			finished()
+		msgBox = QtGui.QMessageBox()
+		msgBox.setText(self.__str__())
+		msgBox.setWindowTitle('Game Over')
+		msgBox.setGeometry(400, 350, 500, 350)
+		msgBox.setStandardButtons(QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+		ans = msgBox.exec_()
+		if ans == QtGui.QMessageBox.Yes:
+			self.restart()
 		else:
-			event.ignore()
-
+			self.show()
+			
+	def restart(self):
+		start = Layout()
+		self.close(start.show())
 
 if __name__ == '__main__':
 	app = QtGui.QApplication(sys.argv)
