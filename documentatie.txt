@@ -1,0 +1,14 @@
+Project naam:Hunt the wumpus
+Groepleden: Xiaoying Chen, Maryam Mohamed(Koen Jobse was met de project gestopt)
+
+Alle functies zitten in een class HuntTheWumpus.
+Functies initUI, paintEvent en drawRectangle zijn om de layout van de game te tekenen.
+Functies player en updateUI zorgen voor dat er een player is en door de room kan bewegen.
+Functies arro en posArrow zorgen voor dat de player kan schieten met arrow.
+Functie wumpus zorgt voor dat een wumpus bestaat.
+Functies gold,pit en bats zorgen voor dat in de room, een van deze elementen voorkomen.
+Functies scr geeft score terug van de player.
+Functies death en victory geven aan dat de game over is.
+Functies opmerkingbalk, opmUp en __str__ geven informatie aan de player.
+Functies GameOver en restart geeft de player optie om de game opnieuw te spelen.
+
