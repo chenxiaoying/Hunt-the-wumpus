@@ -1,0 +1,24 @@
+Hunt the Wumpus
+Xiaoying Chen en Maryam Mohamed
+
+Documentatie voor de gebruikers
+
+Doel spel:
+De player moet de wumpus doden met een arrow
+
+1.De speler kan door alle kamers bewegen door op de button(left,right,up,down) te drukken.
+  De speler moet voorzichtig zijn. Want:
+  Als de speler de wumpus raakt --> De speler is dood. Game over
+  Als de speler valt in een put --> De speler is dood. Game over
+  Als de speler op de positie van de Bat staat. Bat verplaatst de speler naar een andere plek.
+
+2.De speler heeft 5 arrow om de wumpus te schieten. Als alle arrows zijn gebruikt, heeft de speler geen kans meer om te winnen.
+  Als de arrow de wumpus raakt --> De speler wint. Game Over
+
+3.De speler kan punten scoren door:
+  Goud vinden
+  Wumpus doden
+
+4.De speler krijgt informatie over waar de wumpus,goud,pit en bat eventueel kunnen zijn.
+  De speler kan de informatie gebruiken om te schatten waar de wumpus zich bevindt, en schiet die met een arrow.
+
